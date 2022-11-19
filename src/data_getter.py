@@ -45,12 +45,13 @@ for set_id in set_ids:
                     select="set,types,images,id,legalities,name,supertype,subtypes")
             break
         except poke.PokemonTcgException:
-            print(f"Problem accessing {set_id}, trying again in 10 seconds")
+            print(f"Problem accessing {set_id} at attempt {fail_count}, trying again in 10 seconds")
             time.sleep(fail_retry_pause)
     else:
         print(f"Problem accessing {set_id}, giving up :(")
         continue
-
+    print(f"Data successfully obtained from {set_id}")
+    
     # Assume cards are all monotype pokemon and take the first type
     images = [(card.images.small, card.types[0], card.id) for card in filter(filter_type, cards)]
 
@@ -63,3 +64,4 @@ for set_id in set_ids:
         if not os.path.isdir(f"../data/{typ}"):
             os.mkdir(f"../data/{typ}")
         img.save(f"../data/{typ}/{card_id}.png")
+    print(f"Images successfully cropped from {set_id}\n")
