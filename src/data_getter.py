@@ -7,6 +7,8 @@ import requests
 from PIL import Image
 import pokemontcgsdk as poke
 
+START_TIME = time.time()
+
 def filter_type(card: poke.card.Card) -> bool:
     '''
     See if a card is a pokémon rather than a trainer or energy and test to make
@@ -68,4 +70,4 @@ for set_id in set_ids:
         if "?" in card_id:
             card_id.replace("?", "%3F")
         img.save(f"../data/{typ}/{card_id}.png")
-    print(f"Images successfully cropped from {set_id}\n")
+    print(f"All images successfully cropped from {set_id}\nCurrent total running time: {(time.time()-START_TIME) / 60} minutes\n")
