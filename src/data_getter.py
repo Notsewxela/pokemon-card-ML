@@ -1,9 +1,9 @@
 import os
 import time
 from io import BytesIO
-import requests
 from dotenv import load_dotenv
 
+import requests
 from PIL import Image
 import pokemontcgsdk as poke
 
@@ -29,7 +29,7 @@ poke.RestClient.configure(API_KEY)
 
 # Get all set IDS in all series
 sets_per_series = [poke.Set.where(q=f"series:\"{series}\"") for series in series_set]
-set_ids = [cardset.id for cardset in sets_in_one_series for sets_in_one_series in sets_per_series]
+set_ids = [cardset.id for sets_in_one_series in sets_per_series for cardset in sets_in_one_series]
 
 try:
     os.mkdir("../data")
@@ -45,7 +45,7 @@ for set_id in set_ids:
                     select="set,types,images,id,legalities,name,supertype,subtypes,number")
             break
         except poke.PokemonTcgException:
-            print(f"Problem accessing {set_id} at attempt {fail_count}, trying again in 10 seconds")
+            print(f"Problem accessing {set_id} at attempt {fail_count + 1}, trying again in 10 seconds")
             time.sleep(fail_retry_pause)
     else:
         print(f"Problem accessing {set_id}, giving up :(")
