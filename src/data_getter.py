@@ -12,8 +12,8 @@ max_fails = 5
 # How long to wait in seconds if it fails getting a set before trying again
 fail_retry_pause = 10
 
-series = "xy"
-
+series_set = set(map(lambda s: s.series, poke.Set.all()))
+print("All series:", ", ".join(series_set))
 
 def filter_type(card: poke.card.Card) -> bool:
     '''
@@ -27,9 +27,9 @@ load_dotenv()
 API_KEY = os.getenv('API_KEY')
 poke.RestClient.configure(API_KEY)
 
-# Get all set IDS in a series
-sets = poke.Set.where(q=f"series:{series}")
-set_ids = [cardset.id for cardset in sets]
+# Get all set IDS in all series
+sets_per_series = [poke.Set.where(q=f"series:\"{series}\"") for series in series_set]
+set_ids = [cardset.id for cardset in sets_in_one_series for sets_in_one_series in sets_per_series]
 
 try:
     os.mkdir("../data")
@@ -42,7 +42,7 @@ for set_id in set_ids:
     for fail_count in range(max_fails):
         try:
             cards = poke.Card.where(q=f"set.id:{set_id}",\
-                    select="set,types,images,id,legalities,name,supertype,subtypes")
+                    select="set,types,images,id,legalities,name,supertype,subtypes,number")
             break
         except poke.PokemonTcgException:
             print(f"Problem accessing {set_id} at attempt {fail_count}, trying again in 10 seconds")
