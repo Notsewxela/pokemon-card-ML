@@ -4,6 +4,7 @@ from io import BytesIO
 from dotenv import load_dotenv
 
 import requests
+import PIL
 from PIL import Image
 import pokemontcgsdk as poke
 
@@ -54,19 +55,27 @@ for set_id in set_ids:
                     select="set,types,images,id,legalities,name,supertype,subtypes,number")
             break
         except poke.PokemonTcgException:
-            print(f"Problem accessing {set_id} at attempt {fail_count + 1}, trying again in 10 seconds")
+            print(f"Problem accessing {set_id} at attempt {fail_count + 1}. Trying again in 10 seconds")
             time.sleep(fail_retry_pause)
     else:
         print(f"Problem accessing {set_id}, giving up :(")
-        continue
+        
     print(f"Data successfully obtained from {set_id}")
     
     # Assume cards are all monotype pokemon and take the first type
     images = [(card.images.small, card.types[0], card.id) for card in filter(filter_type, cards)]
 
     for (url, typ, card_id) in images:
-        response = requests.get(url)
-        img = Image.open(BytesIO(response.content))
+        for fail_count in range(max_fails):
+            response = requests.get(url)
+            try:
+                img = Image.open(BytesIO(response.content))
+                break
+            except PIL.UnidentifedImageError: # Caused if we get dodgy data from http request
+                print(f"Problem accessing image for {card_id} at attempt {fail_count + 1}. Trying again in 10 seconds")
+                time.sleep(fail_retry_pause)
+        else:
+            print(f"Problem accessing image for {card_id}. Giving up :(")
         # Chop out all of card picture that is not the picture bit
         # This means that full art cards are overcropped :(
         img = img.crop((21, 38, img.size[0]-21, img.size[1]-173))
@@ -76,4 +85,5 @@ for set_id in set_ids:
         if "?" in card_id:
             card_id = card_id.replace("?", "%3F")
         img.save(f"../data/{typ}/{card_id}.png")
+
     print(f"All images successfully cropped from {set_id}\nCurrent total running time: {(time.time()-START_TIME) / 60} minutes\n")
