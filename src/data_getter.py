@@ -7,6 +7,13 @@ import requests
 from PIL import Image
 import pokemontcgsdk as poke
 
+def filter_type(card: poke.card.Card) -> bool:
+    '''
+    See if a card is a pokémon rather than a trainer or energy and test to make
+    sure it is not a landscape big card too (called breaks).
+    '''
+    return card.supertype == "Pokémon" and "BREAK" not in card.subtypes
+
 # Max number of acceptable fails to get try get a data set
 max_fails = 5
 # How long to wait in seconds if it fails getting a set before trying again
@@ -15,19 +22,13 @@ fail_retry_pause = 10
 series_set = set(map(lambda s: s.series, poke.Set.all()))
 print("All series:", ", ".join(series_set))
 
-def filter_type(card: poke.card.Card) -> bool:
-    '''
-    See if a card is a pokemon rather than a trainer or energy and test to make
-    sure it is not a landscape big card too (called breaks).
-    '''
-    return card.supertype == "Pokémon" and "BREAK" not in card.subtypes
-
 # Set our API key and create our client for getting data
 load_dotenv()
 API_KEY = os.getenv('API_KEY')
 poke.RestClient.configure(API_KEY)
 
 # Get all set IDS in all series
+# Need the double quotes to deal with http request stuff not liking spaces in names
 sets_per_series = [poke.Set.where(q=f"series:\"{series}\"") for series in series_set]
 set_ids = [cardset.id for sets_in_one_series in sets_per_series for cardset in sets_in_one_series]
 
@@ -63,5 +64,7 @@ for set_id in set_ids:
         img = img.crop((21, 38, img.size[0]-21, img.size[1]-173))
         if not os.path.isdir(f"../data/{typ}"):
             os.mkdir(f"../data/{typ}")
+        if "?" in card_id:
+            card_id.replace("?", "%3F")
         img.save(f"../data/{typ}/{card_id}.png")
     print(f"Images successfully cropped from {set_id}\n")
