@@ -34,6 +34,12 @@ poke.RestClient.configure(API_KEY)
 sets_per_series = [poke.Set.where(q=f"series:\"{series}\"") for series in series_set]
 set_ids = [cardset.id for sets_in_one_series in sets_per_series for cardset in sets_in_one_series]
 
+# Remove dodgy data sets with no picture data
+set_ids.remove("mcd14")
+set_ids.remove("mcd15")
+set_ids.remove("mcd17")
+set_ids.remove("mcd18")
+
 try:
     os.mkdir("../data")
 except FileExistsError:
