@@ -64,6 +64,7 @@ for set_id in set_ids:
         img = img.crop((21, 38, img.size[0]-21, img.size[1]-173))
         if not os.path.isdir(f"../data/{typ}"):
             os.mkdir(f"../data/{typ}")
+        # ? cannot be ina file name, so replace it with url equivalent
         if "?" in card_id:
             card_id.replace("?", "%3F")
         img.save(f"../data/{typ}/{card_id}.png")
