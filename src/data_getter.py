@@ -68,6 +68,6 @@ for set_id in set_ids:
             os.mkdir(f"../data/{typ}")
         # ? cannot be ina file name, so replace it with url equivalent
         if "?" in card_id:
-            card_id.replace("?", "%3F")
+            card_id = card_id.replace("?", "%3F")
         img.save(f"../data/{typ}/{card_id}.png")
     print(f"All images successfully cropped from {set_id}\nCurrent total running time: {(time.time()-START_TIME) / 60} minutes\n")
