@@ -8,6 +8,6 @@ To run this code, you need:
 - a `.env` file in the top level directory containing an `API_KEY` environment variable allowing access to the [Pokémon TCG IO API](https://dev.pokemontcg.io/).
 - pokemontcgsdk python library
 - tensorflow python library
-- PILLOW python library
+- Pillow python library
 
 All the libraries are pip installable.
