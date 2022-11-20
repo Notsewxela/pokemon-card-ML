@@ -9,9 +9,6 @@ from tensorflow.keras.models import Sequential
 
 import pathlib
 
-# TODO: Augment dataset
-
-
 # Size of batches of the data
 batch_size = 32
 # What our network should rescale our images to 
@@ -131,3 +128,22 @@ plt.xlim(0.8, epochs+1.001)
 plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.show()
+
+from sklearn.metrics import plot_confusion_matrix
+
+class estimator:
+  _estimator_type = ''
+  classes_=[]
+  def __init__(self, model, classes):
+    self.model = model
+    self._estimator_type = 'classifier'
+    self.classes_ = classes
+  def predict(self, X):
+    y_prob= self.model.predict(X)
+    y_pred = y_prob.argmax(axis=1)
+    return y_pred
+
+classifier = estimator(model, class_names)
+
+figsize = (12,12)
+plot_confusion_matrix(estimator=classifier, X=np.concatenate([x for x, y in val_ds], axis=0), y_true=np.concatenate([y for x, y in val_ds], axis=0), cmap='Blues', normalize='true', ax=plt.subplots(figsize=figsize)[1])
