@@ -133,17 +133,19 @@ from sklearn.metrics import plot_confusion_matrix
 
 class estimator:
   _estimator_type = ''
-  classes_=[]
+  classes_ = []
   def __init__(self, model, classes):
     self.model = model
     self._estimator_type = 'classifier'
     self.classes_ = classes
   def predict(self, X):
-    y_prob= self.model.predict(X)
+    y_prob = self.model.predict(X)
     y_pred = y_prob.argmax(axis=1)
     return y_pred
 
 classifier = estimator(model, class_names)
 
 figsize = (12,12)
-plot_confusion_matrix(estimator=classifier, X=np.concatenate([x for x, y in val_ds], axis=0), y_true=np.concatenate([y for x, y in val_ds], axis=0), cmap='Blues', normalize='true', ax=plt.subplots(figsize=figsize)[1])
+plot_confusion_matrix(estimator=classifier, X=np.concatenate([x for x, y in val_ds], axis=0),\
+    y_true=np.concatenate([y for x, y in val_ds], axis=0),\
+    cmap='Blues', normalize='true', ax=plt.subplots(figsize=figsize)[1])
